@@ -172,7 +172,7 @@ Starting capture... SIGTERM to quit.
 
 This will filter out requests that do not match the given key. Unfortunately it may not be as useful as you'd think: the binary protocol requires most operations that take a key for the request not to return the key as part of the response. The exceptions to this rule are the GetK and GetKQ - get key, get key/quiet - operations, which a given client may or may not use.
 
-If you can't trigger your client to send GetK/GetKQ requests, in the future you may be able to track the opaque/IP/port of the get request to the corresponding response. This may get a little tricky in a high volume, clustered situation. *** TBA: link GitHub issue for parent packet-level filtering ***
+If you can't trigger your client to send GetK/GetKQ requests, [in the future](https://github.com/kog/cachesplain/issues/1) you may be able to track the opaque/IP/port of the get request to the corresponding response. This may get a little tricky in a high volume, clustered situation.
 
 
 ###### Filtering based on Opcode:
