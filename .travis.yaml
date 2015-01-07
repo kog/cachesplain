@@ -1,0 +1,6 @@
+language: csharp
+solution: cachesplain.sln
+install:
+- nuget restore cachesplain.sln
+script:
+- xbuild cachesplain.sln /target:Rebuild /p:Configuration=release /p:PlatformTarget=x86 
