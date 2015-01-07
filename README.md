@@ -2,7 +2,7 @@ CacheSplain - A tool for helping with Memcached
 =============
 *** TBA: Travis build status ***
 
-This readme provides a basic set of information about CacheSplain. CacheSplain is MIT licensed. Please see LICENSE.txt for details **(TBA: GitHub link) **.
+This readme provides a basic set of information about CacheSplain. CacheSplain is MIT licensed. Please see [LICENSE.txt](https://github.com/kog/cachesplain/blob/master/LICENSE.txt) for details.
 
 It helps if you have .NET already installed (Mono, MS CLR), libpcap installed (via WireShark or otherwise) and have some familiarity with the [Memcached binary protocol](https://code.google.com/p/memcached/wiki/BinaryProtocolRevamped).
 
@@ -154,7 +154,7 @@ Expression Based Filtering
 
 CacheSplain incorporates [Solenoid-Expressions](https://github.com/jakesays/Solenoid-Expressions), a fork of [Spring.NET's](http://springframework.net/) implementation of SPEL (Spring Expression Language) in order to allow users to do fine grained, post parsing filtering of operations.
 
-This means that if you know what the MemcachedBinaryOperation and associated object model look like *** (TBA: link)***, you can filter out the noise that you don't care about analyzing. Say you've got a keep-alive at your app level that constantly sends "version" calls you don't care about, you can pass in an expression to ignore these - with something like `"Opcode == OpCode.Version"`.
+This means that if you know what the [MemcachedBinaryOperation](https://github.com/kog/cachesplain/blob/master/cachesplain/Protocol/MemcachedBinaryOperation.cs) and associated object model look like, you can filter out the noise that you don't care about analyzing. Say you've got a keep-alive at your app level that constantly sends "version" calls you don't care about, you can pass in an expression to ignore these - with something like `"Opcode == OpCode.Version"`.
 
 The filter works by evaluating the expression as a boolean condition, and only allowing operations through that are true. This means that if you have an expression that can't be parsed (IE: it's random typing), it'll be ignored. Likewise, if you write an expression that can't be parsed to a boolean, it won't filter anyting either. The object input to the expression evaluation is the MemcachedBinaryOperation itself.
 
@@ -183,7 +183,7 @@ Starting capture... SIGTERM to quit.
 
 This will filter out any traffic that is not a get operation (request or response). The end result is that your out.log will contain only get operations - or nothing if there are no get operations.
 
-*** TBA: add link to Opcode.cs ***
+Read the [Opcode.cs source](https://github.com/kog/cachesplain/blob/master/cachesplain/Protocol/Opcode.cs) for other things you can filter on.
 
 
 ###### Filtering inbound traffic (responses from Memcached):
@@ -194,7 +194,7 @@ Starting capture... SIGTERM to quit.
 
 By investigating the "magic" from the header, we can tell what direction the traffic is going in. Requested is from the client to the server, received is the inverse (server -> client). This can be incredibly handy if you're looking at something like traffic on a server or some sort of proxy/network appliance.
 
-*** TBA: add link to MemcachedBinaryOperation.cs ***
+Check out the [MemcachedBinaryOperation.cs source](https://github.com/kog/cachesplain/blob/master/cachesplain/Protocol/MemcachedBinaryOperation.cs) for other things you can filter on.
 
 
 ###### Filtering outbound traffic (requests to Memcached):
@@ -253,21 +253,8 @@ Acknowledgements
 
 First and foremost, Dormando  - the guy who maintains [Memcached](http://memcached.org/) - has been incredibly helpful in terms of answering questions and helping troubleshoot issues. Maintaining Memcached is not his day job, and people do tend to be quite impolite, yet he still found time to respond. Much appreciated.
 
-It's also worth noting that the BinaryHelper class *** (TBA - link to GitHub source) *** is more or less lifted wholesale from the [Apache2](http://opensource.org/licenses/Apache-2.0) licensed .NET Memcached client [EnyimMemcached](https://github.com/enyim/EnyimMemcached). I use the code to do some bit twiddling on multi-byte header fields. I have no idea if EnyimMemcached is any good as I've never used it, but the bit twiddling is mighty fine. No sense in reinventing the wheel if someone's already done it better than you will.
+It's also worth noting that the [BinaryHelper](https://github.com/kog/cachesplain/blob/master/cachesplain/Protocol/BinaryHelper.cs) class is more or less lifted wholesale from the [Apache2](http://opensource.org/licenses/Apache-2.0) licensed .NET Memcached client [EnyimMemcached](https://github.com/enyim/EnyimMemcached). I use the code to do some bit twiddling on multi-byte header fields. I have no idea if EnyimMemcached is any good as I've never used it, but the bit twiddling is mighty fine. No sense in reinventing the wheel if someone's already done it better than you will.
 
 Thanks to [JakeSays](https://github.com/jakesays/) for paring down Spring.NET's expression support into [Solenoid-Expressions](https://github.com/jakesays/Solenoid-Expressions). It really cuts down on the size of dependencies... Here's hoping he'll succeed with his next-gen re-write.
 
 Lastly, this markdown was written using [Mou](http://25.io/mou/) and [Atom](https://atom.io/).
-
-
-Open Source Components Used (will eventually be on the Wiki):
---
-
-| Dependency | Version | License | Purpose |
-|----------------------------------------|
-|BinaryHelper.cs ***TBA: link GitHub *** | [67678bfc9e](https://github.com/enyim/EnyimMemcached/blob/67678bfc9e379af45c8b12e9709f976a6cc889d4/Enyim.Caching/Memcached/Protocol/Binary/BinaryConverter.cs) | [Apache2](https://github.com/enyim/EnyimMemcached/blob/master/LICENSE) | Bit twiddling |
-|[Mono.Options](https://www.nuget.org/packages/Mono.Options/) | 1.1 | [MIT](https://github.com/mono/mono/blob/master/mcs/class/Mono.Options/Mono.Options/Options.cs)| Handling user input|
-|[NLog](https://www.nuget.org/packages/NLog/)|3.1.0.0|[BSD](https://raw.githubusercontent.com/NLog/NLog/master/LICENSE.txt)|Logging|
-|[PacketDotNet](https://www.nuget.org/packages/PacketDotNet/) | 0.13.0 | [LGPL v3](http://sourceforge.net/projects/packetnet/) | Dependency of SharpPcap|
-|[SharpPcap](http://www.nuget.org/packages/SharpPcap/) | 4.2.0 | [LGPL v3](http://sourceforge.net/projects/sharppcap/)| Sniffing and understanding packets|
-|[Solenoid-Expressions](http://www.nuget.org/packages/Solenoid.Expressions/) | 1.0.0.2 | [Apache2](https://raw.githubusercontent.com/jakesays/Solenoid-Expressions/master/LICENSE) | Application-level expression based filtering|
