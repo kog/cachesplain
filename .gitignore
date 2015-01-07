@@ -1,0 +1,13 @@
+*/obj
+*/bin
+*.suo
+*.ReSharper.user
+packages/*
+*.sh
+*.bat
+*.bin
+*.log
+*.swp
+*.sln.*
+*.userprefs
+*.csproj.user
