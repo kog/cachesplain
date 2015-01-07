@@ -1,6 +1,6 @@
 CacheSplain - A tool for helping with Memcached
 =============
-*** TBA: Travis build status ***
+![Build Status](https://travis-ci.org/kog/cachesplain.svg?branch=master)
 
 This readme provides a basic set of information about CacheSplain. CacheSplain is MIT licensed. Please see [LICENSE.txt](https://github.com/kog/cachesplain/blob/master/LICENSE.txt) for details.
 
@@ -40,7 +40,7 @@ Build Instructions
 
 Before you try and build or run CacheSplain you should install [WireShark](https://www.wireshark.org/) for your platform. This should ensure that you have the appropriate libraries (namely libpcap). This may be addressed at a later time, hopefully working out of the box.
 
-Once you have WireShark installed, you should be able to build the project using an IDE such as Visual Studio or MonoDevelop, or by using something like XBuild on Mono. The build should work out of the box **(TBA: Travis link)**, and you should be able to run the resulting executable. Please note that the App.config is only used for configuring NLog, and all arguments are passed on the command line.
+Once you have WireShark installed, you should be able to build the project using an IDE such as Visual Studio or MonoDevelop, or by using something like XBuild on Mono. The build should work out of the box (check the build status top of the page), and you should be able to run the resulting executable. Please note that the App.config is only used for configuring NLog, and all arguments are passed on the command line.
 
 If you are planning on running this on anything but Windows, make sure that you have [Mono](http://www.mono-project.com/) installed. If you can't find a package for your OS/distro, you can always compile your own from source easily enough from their [GitHub repo](https://github.com/mono/mono).
 
