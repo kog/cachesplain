@@ -36,8 +36,6 @@ I have yet to try this on incredibly large dumps, so it's possible that it has i
 Build Instructions
 --
 
-**(TODO: Try and remove WireShark install dependency)**
-
 Before you try and build or run CacheSplain you should install [WireShark](https://www.wireshark.org/) for your platform. This should ensure that you have the appropriate libraries (namely libpcap). This may be addressed at a later time, hopefully working out of the box.
 
 Once you have WireShark installed, you should be able to build the project using an IDE such as Visual Studio or MonoDevelop, or by using something like XBuild on Mono. The build should work out of the box (check the build status top of the page), and you should be able to run the resulting executable. Please note that the App.config is only used for configuring NLog, and all arguments are passed on the command line.
@@ -172,7 +170,7 @@ Starting capture... SIGTERM to quit.
 
 This will filter out requests that do not match the given key. Unfortunately it may not be as useful as you'd think: the binary protocol requires most operations that take a key for the request not to return the key as part of the response. The exceptions to this rule are the GetK and GetKQ - get key, get key/quiet - operations, which a given client may or may not use.
 
-If you can't trigger your client to send GetK/GetKQ requests, [in the future](https://github.com/kog/cachesplain/issues/1) you may be able to track the opaque/IP/port of the get request to the corresponding response. This may get a little tricky in a high volume, clustered situation.
+If you can't trigger your client to send GetK/GetKQ requests, you may be able to track the opaque/IP/port of the get request to the corresponding response. This may get a little tricky in a high volume, clustered situation.
 
 
 ###### Filtering based on Opcode:
@@ -247,6 +245,77 @@ Looking at expiration values can be handy for a variety of reasons:
 
 
 If you want more information on constructing expressions, please see the Solenoid documentation at [Solenoid-Expressions](https://github.com/jakesays/Solenoid-Expressions).
+
+#### Filtering based on MemcachedBinaryPacket properties
+
+There are a few aggregate bits of information on the [MemcachedBinaryPacket](https://github.com/kog/cachesplain/blob/master/cachesplain/Protocol/MemcachedBinaryPacket.cs) container, which contains the various operations for the logical TCP packet. This includes things like the source/destination address, the time, the size and the number of operations.
+
+The syntax for accessing the packet is a little different as its bound to a variable (rather than the object). You'll have to access anything on the container packet via the literal string `#packet`.
+
+###### Filtering on number of operations per packet
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.operationCount > 5"
+Starting capture... SIGTERM to quit.
+```
+
+this would help you find requests that are pipelined. This can useful for looking for bulk gets and other optimizations.
+
+###### Filtering based on packet size
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.packetSize > 92"
+Starting capture... SIGTERM to quit.
+```
+
+The expression above would filter out any packets smaller than 92 bytes. The value is calculated based on the remaineder of the packet after all the other headers, that is, up until the end of the TCP boundary - where parsing for our protocol starts.
+
+The difference between the size of the packet and the size of the operation are mainly important when pipelining occurs.
+
+###### Filtering based on source IP
+
+If you want to based on the source of the TCP packet, you'll do something like this:
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.sourceAddress =='192.168.1.1'"
+Starting capture... SIGTERM to quit.
+```
+
+It's important to remember that Memcached is a request/response protocol, and that the source address is the TCP source address. The source on a request will be the client, the source on a response will be the server (or proxy, or networking appliance).
+
+
+###### Filtering based on destination IP
+
+Pretty much the opposite of the above example:
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.destinationAddress == '192.168.1.1'"
+Starting capture... SIGTERM to quit.
+```
+
+###### Filtering based on relevant port
+
+In this case, the "relevant" port means the port that you asked CacheSplain to listen to traffic on. We only record this port, since the other side that gets bound to isn't particularly useful - and in the few cases it is, can be found via other methods.
+
+You'd filter on port like so:
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.port == 11211"
+Starting capture... SIGTERM to quit.
+```
+
+This won't be immediately useful as CacheSplain only looks for traffic on a single port. This is [issue #8](https://github.com/kog/cachesplain/issues/8).
+
+###### Filtering based on time
+
+If you want to filter based on the time of the packet in the stream - say you're looking at a surge in traffic that started at X time - you'd wind up doing something like:
+
+```
+$ mono cachesplain.exe -i=en1 -p=11211 -x="#packet.packetTime > date('2015-01-10 11:47:00', 'yyyy-MM-dd HH:mm:ss')"
+Starting capture... SIGTERM to quit.
+```
+
+The time formatting is also explained a bit in the [Solenoid docs](https://github.com/jakesays/Solenoid-Expressions/blob/master/Docs/SolenoidExpressions.md). Note that the time is UTC, not local.
 
 Acknowledgements
 --
