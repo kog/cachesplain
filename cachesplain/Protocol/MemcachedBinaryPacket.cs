@@ -36,6 +36,16 @@ namespace cachesplain.Protocol
 		public IEnumerable<MemcachedBinaryOperation> Operations {get { return _operations; }
 																 set { _operations = value; }}
 
+        /// <summary>
+        /// Gets or sets the number of operations contained in the given packet.
+        /// </summary>
+        /// 
+        /// <remarks>
+        /// This is encapsulated as a property, as opposed to calling Count is so that we don't need to walk the <see cref="IEnumerable"/>
+        /// every time we're trying to figure out how many operations occurred.
+        /// </remarks>
+        public int OperationCount { get; set; }
+
 		/// <summary>
 		/// Gets or sets the time at which this packet was sent or received. 
 		/// </summary>
@@ -157,6 +167,7 @@ namespace cachesplain.Protocol
 				_logger.Warn("Caught a mangled packet, discarding", ex);
 			}
 
+		    OperationCount = packets.Count;
 			_operations = packets;
 		}
 

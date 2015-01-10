@@ -5,6 +5,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -299,19 +300,17 @@ namespace cachesplain
 				        Port = Port
 				    };
 
-
 				    var i = 0;
 
 					foreach(var operation in packet.Operations) 
 					{
-
 						// If we've got a filter expression, see what it does...
 						try
-						{	
-							if (RawFilterExpression == null || (bool)filterExpression.GetValue(operation))
+						{
+						    if (RawFilterExpression == null || (bool)filterExpression.GetValue(operation, new Dictionary<string, object> {{"packet", packet}}))
 							{
 								// TODO: [Greg 01/02/2015] - Figure out something better to do with the packets.
-								LogPacket(++i, packet.Operations.Count(), packet, operation);
+								LogPacket(++i, packet.OperationCount, packet, operation);
 							}
 						}
 						catch (Exception ex)
