@@ -5,7 +5,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -344,7 +343,7 @@ namespace cachesplain
 		/// </remarks>
 		public static void LogPacket(int index, int count, MemcachedBinaryPacket packet, MemcachedBinaryOperation operation)
 		{
-			Logger.Debug("{0} -> {1} {2} {3} ({5}/{6}: {4}k) Packet {7}: {8} {9} {10} {11}", 
+			Logger.Debug("{0} -> {1} {2} {3} UTC ({5}/{6}: {4} bytes) Packet {7}: {8} {9} {10} {11}", 
 				packet.SourceAddress, packet.DestinationAddress, packet.Port, packet.PacketTime.ToUniversalTime(), packet.PacketSize, 
 				index, count, operation.Magic, operation.Opcode, 
 				(String.IsNullOrWhiteSpace(operation.Key)) ? "<key omitted>" : operation.Key.ToString(CultureInfo.InvariantCulture), 
