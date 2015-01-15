@@ -109,9 +109,14 @@ At this point you'd start reading your out.log. This mode will read until SIGTER
 
 
 ###### Listening to multiple devices/on multiple ports:
+```
+$ mono cachesplain.exe -i=en1 -p=11211,11212,11213
+Starting capture... SIGTERM to quit.
+```
 
-*At present there's no way to do this from a single process - you'll need to run multiple instances of CacheSplain to do this. You'll probably want a distinct directory for each, as the logging just goes to out.log for now. This should improve when other output options arrive.*
+Instead of a single port, passing in a comma-separated set of ports will cause CacheSplain to listen to multiple ports simultaenously.
 
+For listening to multiple devices it is recommended to do so from multiple instances of CacheSplain: one for each device.
 
 ###### Reading a PCAP file:
 ```

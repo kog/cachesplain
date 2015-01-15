@@ -15,13 +15,14 @@ using NLog;
 using Mono.Options;
 using SharpPcap.LibPcap;
 using System.IO;
+using NUnit.Framework;
 using Solenoid.Expressions;
 
 // TODO [Greg 12/31/2014] : Needs some refactoring love... Better namespacing/separation etc. 
 
 namespace cachesplain 
 {
-	class App
+	public class App
 	{
 		/// <summary>
 		/// Holds the name of the device we want to listen on. This is specified via the starting options.
@@ -35,9 +36,9 @@ namespace cachesplain
 		private static string DeviceName;
 
 		/// <summary>
-		/// Holds the port we want to listen on. This defaults to 11211 (the usual Memcached port), but can be specified via the starting options.
+		/// Holds the ports we want to listen on. This defaults to 11211 (the usual Memcached port), but can be specified via the starting options.
 		/// </summary>
-		private static int Port = 11211;
+		private static IEnumerable<int> Ports = new[]{11211};
 
 		/// <summary>
 		/// Holds whether or not the user needs some help running the app - either requested, or due to missing parameters.
@@ -106,7 +107,7 @@ namespace cachesplain
 				// If we're a live interface, we're going to drop into promiscuous mode. Most people will be in a switched environment, so this won't be a problem.
 				Logger.Info("Configuring PCAP");
 				device.Open(DeviceMode.Promiscuous, 10000);
-				Logger.Info("Listening to interface {0} on port {1}", DeviceName, Port);
+				Logger.Info("Listening to interface {0} on port(s) {1}", DeviceName, String.Join(",", Ports));
 			}
 			else
 			{
@@ -261,14 +262,17 @@ namespace cachesplain
 				"Options:",
                 { "d", "enumerate the network devices available for listening.", v => EnumerateDevices = (v != null) },
 				{ "i:", "the {NAME} of the interface to listen on. Will be ignored if an input PCAP file is specified.", v => DeviceName = v },
-				{ "p:",  "the {PORT} to listen on.\n" +  "this must be an integer. Defaults to 11211 if not otherwise specified.", (int v) => Port = v },
+				{ "p:",  "the {PORT} to listen on.\n" +  "this must be an integer. Defaults to 11211 if not otherwise specified. To specify multiple ports, separate them via commas.", v => Ports = ParsePorts(v) },
 				{ "h|help",  "show this message and exit",  v => NeedsHelp = (v != null) },
 				{ "f:", "a PCAP file to use instead of a device. If specified, will be used as the input device instead of specified interface.", v => PCAPFile = v},
 				{ "x:", "An optional app-level filter expression to filter out packets (IE: opcode, magic, flags etc). Please note this is run across a parsed MemcachedBinaryOperation.", v => RawFilterExpression = v }
 			};
 		}
 
-		// TODO: [Greg 01/02/2015] - This is a fairly low level networking thing... Should move all the actual packet abstractions into something dedicated to them.
+	    // TODO: [Greg 01/02/2015] - This is a fairly low level networking thing... Should move all the actual packet abstractions into something dedicated to them.
+
+	    // TODO [Greg 01/15/2015] : Probably want to perf test this too. Probably worth moving the port filtering back into the LibPCAP filter, though it did
+	    // TODO [Greg 01/15/2015] : seem to cause artifical misses on PCAP files instead of live interfaces...
 
 		/// <summary>
 		/// Handles an incoming packet, attempting to parse it into something useful.
@@ -287,38 +291,43 @@ namespace cachesplain
 				var parsed = Packet.ParsePacket(eventArgs.Packet.LinkLayerType, eventArgs.Packet.Data);
 				var tcpPacket = (TcpPacket)parsed.Extract(typeof(TcpPacket));
 
-				if(null != tcpPacket && null != tcpPacket.PayloadData && tcpPacket.PayloadData.Length > 0 && (tcpPacket.DestinationPort == Port || tcpPacket.SourcePort == Port)) 
+				if(null != tcpPacket && null != tcpPacket.PayloadData && tcpPacket.PayloadData.Length > 0)
 				{
-					var ipPacket = (IpPacket)tcpPacket.ParentPacket;
-				    var packet = new MemcachedBinaryPacket(tcpPacket.PayloadData)
+				    var relevantPort = DetermineRelevantPort(tcpPacket.DestinationPort, tcpPacket.SourcePort, Ports);
+
+				    if (null != relevantPort)
 				    {
-				        PacketTime = eventArgs.Packet.Timeval.Date,
-				        SourceAddress = ipPacket.SourceAddress.ToString(),
-				        DestinationAddress = ipPacket.DestinationAddress.ToString(),
-				        PacketSize = tcpPacket.PayloadData.LongLength,
-				        Port = Port
-				    };
+                        var ipPacket = (IpPacket)tcpPacket.ParentPacket;
+                        var packet = new MemcachedBinaryPacket(tcpPacket.PayloadData)
+                        {
+                            PacketTime = eventArgs.Packet.Timeval.Date,
+                            SourceAddress = ipPacket.SourceAddress.ToString(),
+                            DestinationAddress = ipPacket.DestinationAddress.ToString(),
+                            PacketSize = tcpPacket.PayloadData.LongLength,
+                            Port = relevantPort.Value
+                        };
 
-				    var i = 0;
+                        var i = 0;
 
-					foreach(var operation in packet.Operations) 
-					{
-						// If we've got a filter expression, see what it does...
-						try
-						{
-						    if (RawFilterExpression == null || (bool)filterExpression.GetValue(operation, new Dictionary<string, object> {{"packet", packet}}))
-							{
-								// TODO: [Greg 01/02/2015] - Figure out something better to do with the packets.
-								LogPacket(++i, packet.OperationCount, packet, operation);
-							}
-						}
-						catch (Exception ex)
-						{
-							// TODO [Greg 12/27/2014] : Need to come back and re-think this. If we've got an invalid expression, could lead to a lot of log spam.
-							Logger.Warn("Ignoring invalid expression \"{0}\": {1}...", RawFilterExpression, ex.Message);
-							LogPacket(++i, packet.Operations.Count(), packet, operation);
-						}
-					}
+                        foreach (var operation in packet.Operations)
+                        {
+                            // If we've got a filter expression, see what it does...
+                            try
+                            {
+                                if (RawFilterExpression == null || (bool)filterExpression.GetValue(operation, new Dictionary<string, object> { { "packet", packet } }))
+                                {
+                                    // TODO: [Greg 01/02/2015] - Figure out something better to do with the packets.
+                                    LogPacket(++i, packet.OperationCount, packet, operation);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // TODO [Greg 12/27/2014] : Need to come back and re-think this. If we've got an invalid expression, could lead to a lot of log spam.
+                                Logger.Warn("Ignoring invalid expression \"{0}\": {1}...", RawFilterExpression, ex.Message);
+                                LogPacket(++i, packet.Operations.Count(), packet, operation);
+                            }
+                        }    
+				    }
 				}
 			}
 			else 
@@ -327,7 +336,7 @@ namespace cachesplain
 			}
 		}
 
-		// TODO [Greg 01/02/2015] - This should go away when we actually do something with our packets...
+	    // TODO [Greg 01/02/2015] - This should go away when we actually do something with our packets...
 
 		/// <summary>
 		/// Provides a convenience method to log a given packet.
@@ -350,5 +359,63 @@ namespace cachesplain
 				(operation.Extras != null) ? operation.Extras.ToString() : "", 
 				(operation.Magic == MagicValue.Received) ? "= " + (ResponseStatus)operation.Header.StatusOrVbucketId : "");
 		}
+
+	    // TODO [Greg 01/15/2015] : Migrate CLI handling/runner into another, non entry method class... 
+
+        /// <summary>
+        /// Provides a convenience method to parse the command-line given string of port(s) into an enumable of integers.
+        /// </summary>
+        /// 
+        /// <param name="ports">The raw command-line string of ports to use. Should not be null, should have at least one parseable integer.</param>
+        /// 
+        /// <returns>An enumerable of zero or more ports that we were able to parse. May be empty, will never be null.</returns>
+        public static IEnumerable<int> ParsePorts(string ports)
+        {
+            IEnumerable<int> parsedPorts = null;
+
+            if (!String.IsNullOrWhiteSpace(ports))
+            {
+                parsedPorts = ports.Split(',').Select(x => TryParseNullableInt(x).GetValueOrDefault()).Where(parsed => parsed > 0);
+            }
+
+            return parsedPorts ?? new List<int>();
+        }
+
+        /// <summary>
+        /// Provides a utility method to try and parse a given string into an integer. This is mostly a cheap hack to allow for LINQ to be used.
+        /// </summary>
+        /// 
+        /// <param name="raw">The raw string to parse. Should not be null, should be a numerical value.</param>
+        /// <returns>The numerical value of the string, if possible, else null.</returns>
+        /// 
+        /// <remarks>
+        /// If this looks familiar, yes it is from http://stackoverflow.com/questions/4961675/select-parsed-int-if-string-was-parseable-to-int.
+        /// </remarks>
+	    public static int? TryParseNullableInt(string raw)
+	    {
+	        int value;
+	        return int.TryParse(raw, out value) ? (int?) value : null;
+	    }
+
+	    /// <summary>
+	    /// Provides a utility method to try and figure out which of the ports we're listening to a packet came from. If Any.
+	    /// </summary>
+	    /// 
+	    /// <param name="sourcePort">The source port of the TCP packet.</param>
+	    /// <param name="destinationPort">The destination port of the TCP packet.</param>
+	    /// <param name="portsOfInterest">The list of ports we're listening on. Must not be null.</param>
+	    /// 
+	    /// <returns>The relevant source or destination port for the packet.</returns>
+	    public static int? DetermineRelevantPort(ushort sourcePort, ushort destinationPort, IEnumerable<int> portsOfInterest)
+	    {
+	        var port = 0;
+
+	        if (null != portsOfInterest)
+	        {
+	            port = portsOfInterest.FirstOrDefault(x => x == sourcePort || x == destinationPort);
+	        }
+
+	        return (0 == port) ? (int?)null : port;
+	    }
 	}
 }
