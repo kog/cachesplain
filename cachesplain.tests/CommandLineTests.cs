@@ -8,12 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-// TODO [Greg 01/15/2015] : Move this into a separate testing assembly during the refactor. Was having an odd time with R#, VS and assembly arches, so this is here for now.
-
 namespace cachesplain.Tests
 {
     [TestFixture]
-    public class CLITests
+    public class CommandLineTests
     {
         /// <summary>
         /// Tests the case where we're given a null port string to parse. This should return 

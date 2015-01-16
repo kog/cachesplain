@@ -1,6 +1,8 @@
 language: csharp
 solution: cachesplain.sln
 install:
-- nuget restore cachesplain.sln
+  - nuget restore cachesplain.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-- xbuild cachesplain.sln /target:Rebuild /p:Configuration=release /p:PlatformTarget=x86 
+  - xbuild cachesplain.sln /target:Rebuild /p:Configuration=release /p:PlatformTarget=x86
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./cachesplain.tests/bin/Release/cachesplain.tests.dll

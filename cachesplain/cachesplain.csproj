@@ -32,9 +32,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="PacketDotNet">
       <HintPath>..\packages\PacketDotNet.0.13.0\lib\net\PacketDotNet.dll</HintPath>
@@ -48,8 +45,6 @@
     <Reference Include="Solenoid.Expressions">
       <HintPath>..\packages\Solenoid.Expressions.1.0.0.2\lib\net45\Solenoid.Expressions.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Protocol\BinaryHelper.cs" />
@@ -63,7 +58,6 @@
     <Compile Include="Protocol\ResponseStatus.cs" />
     <Compile Include="Protocol\Opcode.cs" />
     <Compile Include="Protocol\MemcachedBinaryOperation.cs" />
-    <Compile Include="Tests\CLITests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

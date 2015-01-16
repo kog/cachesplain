@@ -15,7 +15,6 @@ using NLog;
 using Mono.Options;
 using SharpPcap.LibPcap;
 using System.IO;
-using NUnit.Framework;
 using Solenoid.Expressions;
 
 // TODO [Greg 12/31/2014] : Needs some refactoring love... Better namespacing/separation etc. 
