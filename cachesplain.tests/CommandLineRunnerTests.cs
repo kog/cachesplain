@@ -6,6 +6,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace cachesplain.tests
 {
@@ -20,9 +21,8 @@ namespace cachesplain.tests
         public void ParsePortsForNullInput()
         {
             var parsed = App.ParsePorts(null);
-
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);
         }
 
         /// <summary>
@@ -33,12 +33,12 @@ namespace cachesplain.tests
         public void ParsePortsForEmptyInput()
         {
             var parsed = App.ParsePorts("");
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);
 
             parsed = App.ParsePorts("        ");
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);    
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);   
         }
 
         /// <summary>
@@ -49,21 +49,21 @@ namespace cachesplain.tests
         {
             // If all we've got is bogus input, we should get back an empty list of ports.
             var parsed = App.ParsePorts("I,Love,Cheese");
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);   
 
             // If we've got integers buried in cruft, make sure we pull them out properly.
             var ordinalParsed = App.ParsePorts("some,3,stuff,4,here").ToList();
-            Assert.NotNull(ordinalParsed);
-            Assert.AreEqual(2, ordinalParsed.Count);
+            Assert.That(ordinalParsed, Is.Not.Null);
+            Assert.That(2, new EqualConstraint(ordinalParsed.Count));
 
-            Assert.AreEqual(3, ordinalParsed[0]);
-            Assert.AreEqual(4, ordinalParsed[1]);
+            Assert.That(3, new EqualConstraint(ordinalParsed[0]));
+            Assert.That(4, new EqualConstraint(ordinalParsed[1]));
 
             // Partial fragments with numbers are not parseable.
             parsed = App.ParsePorts("99redballoons");
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);   
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace cachesplain.tests
         {
             var parsed = App.ParsePorts("0");
 
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);   
         }
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace cachesplain.tests
         {
             var parsed = App.ParsePorts(",,,,,");
 
-            Assert.NotNull(parsed);
-            Assert.IsEmpty(parsed);
+            Assert.That(parsed, Is.Not.Null);
+            Assert.That(parsed, Is.Empty);   
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntForNullInput()
         {
-            Assert.IsNull(App.TryParseNullableInt(null));
+            Assert.That(App.TryParseNullableInt(null), Is.Null);
         }
 
         /// <summary>
@@ -108,8 +108,8 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntForEmptyInput()
         {
-            Assert.IsNull(App.TryParseNullableInt(""));
-            Assert.IsNull(App.TryParseNullableInt("   "));
+            Assert.That(App.TryParseNullableInt(""), Is.Null);
+            Assert.That(App.TryParseNullableInt("   "), Is.Null);
         }
 
         /// <summary>
@@ -118,8 +118,8 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntForNonNumericInput()
         {
-            Assert.IsNull(App.TryParseNullableInt("Hello World"));
-            Assert.IsNull(App.TryParseNullableInt("Hello 1234 World"));   
+            Assert.That(App.TryParseNullableInt("Hello World"), Is.Null);
+            Assert.That(App.TryParseNullableInt("Hello 1234 World"), Is.Null);
         }
 
         /// <summary>
@@ -129,8 +129,8 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntNonIntegerInput()
         {
-            Assert.IsNull(App.TryParseNullableInt("3.14f"));
-            Assert.IsNull(App.TryParseNullableInt("3.14"));
+            Assert.That(App.TryParseNullableInt("3.14f"), Is.Null);
+            Assert.That(App.TryParseNullableInt("3.14"), Is.Null);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntIntegerInput()
         {
-            Assert.AreEqual(400, App.TryParseNullableInt("400"));
+            Assert.That(400, new EqualConstraint(App.TryParseNullableInt("400")));
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace cachesplain.tests
         [Test]
         public void TryParseNullableIntLongInput()
         {
-            Assert.IsNull(App.TryParseNullableInt((int.MaxValue + 5L).ToString()));
+            Assert.That(App.TryParseNullableInt((int.MaxValue + 5L).ToString()), Is.Null);
         }
     }
 }

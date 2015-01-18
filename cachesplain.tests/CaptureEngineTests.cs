@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using cachesplain.Engine;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace cachesplain.tests
 {
@@ -33,7 +34,7 @@ namespace cachesplain.tests
         [Test]
         public void DetermineRelevantPortForNullPorts()
         {
-            Assert.IsNull(_captureEngine.DetermineRelevantPort(3, 4, null));
+            Assert.That(_captureEngine.DetermineRelevantPort(3, 4, null), Is.Null);
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace cachesplain.tests
         [Test]
         public void DetermineRelevantPortForEmptyPorts()
         {
-            Assert.IsNull(_captureEngine.DetermineRelevantPort(3, 4, new List<int>()));
+            Assert.That(_captureEngine.DetermineRelevantPort(3, 4, new List<int>()), Is.Null);
         }
 
         /// <summary>
@@ -54,8 +55,8 @@ namespace cachesplain.tests
         {
             // Usually we have one port bound to something local, that no one cares about, and one which is our server port.
             // We wind up having to filter this out since we might be viewing raw traffic from a network appliance or something.
-            Assert.AreEqual(11211, _captureEngine.DetermineRelevantPort(32417, 11211, new List<int> { 11211 }));
-            Assert.AreEqual(11211, _captureEngine.DetermineRelevantPort(11211, 32417, new List<int> { 11211 }));
+            Assert.That(11211, new EqualConstraint(_captureEngine.DetermineRelevantPort(32417, 11211, new List<int> { 11211 })));
+            Assert.That(11211, new EqualConstraint(_captureEngine.DetermineRelevantPort(11211, 32417, new List<int> { 11211 })));
         }
 
         /// <summary>
@@ -66,7 +67,7 @@ namespace cachesplain.tests
         {
             // Pretend we're only doing traffic on 11213 and we're looking for 11211. We'll get nothing back since the traffic
             // is on the wrong port.
-            Assert.IsNull(_captureEngine.DetermineRelevantPort(44444, 11213, new List<int> { 11211 }));
+            Assert.That(_captureEngine.DetermineRelevantPort(44444, 11213, new List<int> { 11211 }), Is.Null);
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace cachesplain.tests
         public void DetermineRelevantPortForZeroInput()
         {
             // We matched, but we'll still get a null since this isn't real.
-            Assert.IsNull(_captureEngine.DetermineRelevantPort(0, 0, new List<int> { 0 }));
+            Assert.That(_captureEngine.DetermineRelevantPort(0, 0, new List<int> { 0 }), Is.Null);
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace cachesplain.tests
         [Test]
         public void DetermineRelevantPortForSamePorts()
         {
-            Assert.AreEqual(11213, _captureEngine.DetermineRelevantPort(11213, 11213, new List<int> { 11211, 11212, 11213 }));
+            Assert.That(11213, new EqualConstraint(_captureEngine.DetermineRelevantPort(11213, 11213, new List<int> { 11211, 11212, 11213 })));
         }
     }
 }
