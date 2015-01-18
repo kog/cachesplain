@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\CaptureEngine.cs" />
     <Compile Include="Protocol\BinaryHelper.cs" />
     <Compile Include="Protocol\MemcachedBinaryExtras.cs" />
     <Compile Include="Protocol\MemcachedBinaryHeader.cs" />
@@ -58,6 +59,8 @@
     <Compile Include="Protocol\ResponseStatus.cs" />
     <Compile Include="Protocol\Opcode.cs" />
     <Compile Include="Protocol\MemcachedBinaryOperation.cs" />
+    <Compile Include="Engine\CaptureOptions.cs" />
+    <Compile Include="Engine\CaptureSource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

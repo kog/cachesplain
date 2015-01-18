@@ -39,7 +39,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandLineTests.cs" />
+    <Compile Include="CaptureEngineTests.cs" />
+    <Compile Include="CommandLineRunnerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
