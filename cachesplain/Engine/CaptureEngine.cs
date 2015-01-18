@@ -20,7 +20,7 @@ namespace cachesplain.Engine
 {
     // TODO [Greg 01/18/2015] : Pardon the dust, starting the refactoring...
     
-    public class CaptureEngine
+    public class CaptureEngine : IDisposable
     {
         /// <summary>
         /// Holds the set of options to use during our capture.
@@ -276,6 +276,11 @@ namespace cachesplain.Engine
             }
 
             return (0 == port) ? (int?)null : port;
+        }
+
+        public void Dispose()
+        {
+            Stop();
         }
     }
 }

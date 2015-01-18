@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using cachesplain.Engine;
 using Mono.Options;
 using NLog;
@@ -43,14 +44,21 @@ namespace cachesplain
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
 		public static void Main(string[] args)
-		{		    
-			ParseArgs(args);
+		{
+		    using (var shutdownManualResetEvent = new ManualResetEvent(false))
+		    {
+                ParseArgs(args);
 
-		    // TODO [Greg 01/18/2015] : Swap this to a using block + reset event
-		    var captureEngine = new CaptureEngine(Options);
-            captureEngine.Start();
-	
-			SetSigtermHook(captureEngine);
+		        using (var captureEngine = new CaptureEngine(Options))
+		        {
+                    // Start ze engine.
+                    captureEngine.Start();
+
+                    // Wire up our shutdown.
+                    SetSigtermHook(captureEngine, shutdownManualResetEvent);
+		            shutdownManualResetEvent.WaitOne();
+		        }  
+		    }
 		}
 
 	    /// <summary>
@@ -108,7 +116,8 @@ namespace cachesplain
 		/// </summary>
 		/// 
 		/// <param name="captureEngine">The capture engine to shut down. Must not be null.</param>
-		public static void SetSigtermHook(CaptureEngine captureEngine)
+		/// <param name="resetEvent">The manual reset event to signal when we've completed shutdown. Must not be null.</param>
+		public static void SetSigtermHook(CaptureEngine captureEngine, ManualResetEvent resetEvent)
 		{
 			Console.CancelKeyPress += (sender, eventArgs) =>  
 			{
@@ -116,8 +125,11 @@ namespace cachesplain
 				Logger.Info("Caught SIGTERM, stopping packet capture...");
 				eventArgs.Cancel = true;
 
+
                 captureEngine.Stop();
 				Logger.Info("Packet capture stopped. Process shut down.");
+
+                resetEvent.Set();
 			};
 		}
 
