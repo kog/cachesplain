@@ -25,7 +25,7 @@ namespace cachesplain.Engine
         /// <summary>
         /// Holds the set of options to use during our capture.
         /// </summary>
-        public CaptureOptions Options { get; set; }
+        public CaptureOptions CaptureOptions { get; set; }
 
         /// <summary>
         /// Holds the device we're going to try and capture from.
@@ -37,17 +37,12 @@ namespace cachesplain.Engine
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        public CaptureEngine(CaptureOptions options)
-        {
-            Options = options;
-        }
-
         public void Start()
         {
             var filterExpression = CompileFilterExpression();
-            Device = GetDevice(Options);
+            Device = GetDevice(CaptureOptions);
 
-            StartCapture(Device, Options, filterExpression);
+            StartCapture(Device, CaptureOptions, filterExpression);
         }
 
         public void Stop()
@@ -70,7 +65,7 @@ namespace cachesplain.Engine
             // TODO [Greg 12/31/2014] : Move handling of the packets elsewhere.
             device.OnPacketArrival += (sender, e) =>
             {
-                HandlePacket(e, filterExpression, Options);
+                HandlePacket(e, filterExpression, CaptureOptions);
             };
 
             Console.WriteLine("Starting capture... SIGTERM to quit.");
@@ -87,15 +82,15 @@ namespace cachesplain.Engine
         public IExpression CompileFilterExpression()
         {
             IExpression filterExpression = null;
-            if (!String.IsNullOrEmpty(Options.RawFilterExpression))
+            if (!String.IsNullOrEmpty(CaptureOptions.RawFilterExpression))
             {
                 try
                 {
-                    filterExpression = Expression.Parse(Options.RawFilterExpression);
+                    filterExpression = Expression.Parse(CaptureOptions.RawFilterExpression);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn("Failed to parse expression {0}: {1}. Ignoring...", Options.RawFilterExpression, ex.Message);
+                    Logger.Warn("Failed to parse expression {0}: {1}. Ignoring...", CaptureOptions.RawFilterExpression, ex.Message);
                 }
             }
 
@@ -219,7 +214,7 @@ namespace cachesplain.Engine
                             catch (Exception ex)
                             {
                                 // TODO [Greg 12/27/2014] : Need to come back and re-think this. If we've got an invalid expression, could lead to a lot of log spam.
-                                Logger.Warn("Ignoring invalid expression \"{0}\": {1}...", Options.RawFilterExpression, ex.Message);
+                                Logger.Warn("Ignoring invalid expression \"{0}\": {1}...", CaptureOptions.RawFilterExpression, ex.Message);
                                 LogPacket(++i, packet.Operations.Count(), packet, operation);
                             }
                         }

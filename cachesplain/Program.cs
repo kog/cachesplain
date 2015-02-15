@@ -49,7 +49,7 @@ namespace cachesplain
 		    {
                 ParseArgs(args);
 
-		        using (var captureEngine = new CaptureEngine(Options))
+		        using (var captureEngine = new CaptureEngine{ CaptureOptions =  Options })
 		        {
                     // Start ze engine.
                     captureEngine.Start();

@@ -24,7 +24,7 @@ namespace cachesplain.tests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _captureEngine = new CaptureEngine(null);
+            _captureEngine = new CaptureEngine();
         }
 
         /// <summary>
