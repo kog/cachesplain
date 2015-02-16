@@ -37,11 +37,13 @@ namespace cachesplain.Protocol.Serialization
                 {
                     // If we've received this packet, then this is actually an enum value.
                     WriteAsString("status", (ResponseStatus) header.StatusOrVbucketId, jsonWriter);
+                    WriteObject("vbucketId", null, jsonWriter);
                 }
                 else
                 {
                     // If we've sent it, however it's probably just a VBucket ID.
-                    WriteObject("status", header.StatusOrVbucketId, jsonWriter);
+                    WriteObject("vbucketId", header.StatusOrVbucketId, jsonWriter);
+                    WriteObject("status", null, jsonWriter);
                 }
 
                 WriteObject("totalBodyLength", header.TotalBodyLength, jsonWriter);

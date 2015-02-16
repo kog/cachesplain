@@ -67,7 +67,7 @@ namespace cachesplain.tests.Protocol.Serialization
             Assert.That("RX## Set (0x01) KeyLen: 5397, ExtLen: 170, DataType: 255, Status/VBucket: 133, BodyLen: 1162167621, Opaque: 303174162, CAS: 11068046444225730969", Is.EqualTo(header.ToString()));
 
             Serializer.Serialize(header, JsonWriter);
-            Assert.That("{\"magic\":\"Received\",\"opCode\":\"Set\",\"keyLength\":5397,\"extrasLength\":170,\"dataType\":255,\"status\":\"Busy\",\"totalBodyLength\":1162167621,\"opaque\":303174162,\"cas\":11068046444225730969}", Is.EqualTo(GetSerializedJson()));
+            Assert.That("{\"magic\":\"Received\",\"opCode\":\"Set\",\"keyLength\":5397,\"extrasLength\":170,\"dataType\":255,\"status\":\"Busy\",\"vbucketId\":null,\"totalBodyLength\":1162167621,\"opaque\":303174162,\"cas\":11068046444225730969}", Is.EqualTo(GetSerializedJson()));
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace cachesplain.tests.Protocol.Serialization
             Assert.That("TX## Touch (0x1C) KeyLen: 5140, ExtLen: 171, DataType: 254, Status/VBucket: 130, BodyLen: 858993459, Opaque: 286331153, CAS: 10995706271387654296", Is.EqualTo(header.ToString()));
 
             Serializer.Serialize(header, JsonWriter);
-            Assert.That("{\"magic\":\"Requested\",\"opCode\":\"Touch\",\"keyLength\":5140,\"extrasLength\":171,\"dataType\":254,\"status\":130,\"totalBodyLength\":858993459,\"opaque\":286331153,\"cas\":10995706271387654296}", Is.EqualTo(GetSerializedJson()));           
+            Assert.That("{\"magic\":\"Requested\",\"opCode\":\"Touch\",\"keyLength\":5140,\"extrasLength\":171,\"dataType\":254,\"vbucketId\":130,\"status\":null,\"totalBodyLength\":858993459,\"opaque\":286331153,\"cas\":10995706271387654296}", Is.EqualTo(GetSerializedJson()));           
         }
     }
 }

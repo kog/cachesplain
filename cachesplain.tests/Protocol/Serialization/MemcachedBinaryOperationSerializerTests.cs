@@ -98,7 +98,7 @@ namespace cachesplain.tests.Protocol.Serialization
             Serializer.Serialize(operation, JsonWriter);
 
             Assert.That("RX## Set (0x01) KeyLen: 5397, ExtLen: 170, DataType: 255, Status/VBucket: 133, BodyLen: 1162167621, Opaque: 303174162, CAS: 11068046444225730969 -> SomeKey", Is.EqualTo(operation.ToString()));
-            Assert.That("{\"key\":\"SomeKey\",\"header\":{\"magic\":\"Received\",\"opCode\":\"Set\",\"keyLength\":5397,\"extrasLength\":170,\"dataType\":255,\"status\":\"Busy\",\"totalBodyLength\":1162167621,\"opaque\":303174162,\"cas\":11068046444225730969},\"extras\":{\"flags\":42,\"expiration\":99,\"amount\":8675309,\"initialValue\":314159265,\"verbosity\":86}}", Is.EqualTo(GetSerializedJson()));
+            Assert.That("{\"key\":\"SomeKey\",\"header\":{\"magic\":\"Received\",\"opCode\":\"Set\",\"keyLength\":5397,\"extrasLength\":170,\"dataType\":255,\"status\":\"Busy\",\"vbucketId\":null,\"totalBodyLength\":1162167621,\"opaque\":303174162,\"cas\":11068046444225730969},\"extras\":{\"flags\":42,\"expiration\":99,\"amount\":8675309,\"initialValue\":314159265,\"verbosity\":86}}", Is.EqualTo(GetSerializedJson()));
         }
     }
 }
