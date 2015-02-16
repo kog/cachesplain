@@ -32,6 +32,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="PacketDotNet">
       <HintPath>..\packages\PacketDotNet.0.13.0\lib\net\PacketDotNet.dll</HintPath>
@@ -61,6 +65,11 @@
     <Compile Include="Protocol\MemcachedBinaryOperation.cs" />
     <Compile Include="Engine\CaptureOptions.cs" />
     <Compile Include="Engine\CaptureSource.cs" />
+    <Compile Include="Protocol\Serialization\BaseMemcachedBinaryObjectSerializer.cs" />
+    <Compile Include="Protocol\Serialization\MemcachedBinaryExtrasSerializer.cs" />
+    <Compile Include="Protocol\Serialization\MemcachedBinaryHeaderSerializer.cs" />
+    <Compile Include="Protocol\Serialization\MemcachedBinaryOperationSerializer.cs" />
+    <Compile Include="Protocol\Serialization\MemcachedBinaryPacketSerializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

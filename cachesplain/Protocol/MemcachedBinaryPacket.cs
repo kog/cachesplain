@@ -119,6 +119,12 @@ namespace cachesplain.Protocol
 		/// </summary>
 		private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+	    // TODO [Greg 02/15/2015] : Added this to aid testing. Fix the packet parsing and clean...    
+	    public MemcachedBinaryPacket()
+	    {
+	        
+	    }
+
 	    // TODO [Greg 01/06/2015] : Move this parsing outside of the packet. 
 
 		/// <summary>

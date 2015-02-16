@@ -251,7 +251,6 @@ namespace cachesplain.Engine
                 (operation.Magic == MagicValue.Received) ? "= " + (ResponseStatus)operation.Header.StatusOrVbucketId : "");
         }
 
-
         /// <summary>
         /// Provides a utility method to try and figure out which of the ports we're listening to a packet came from. If Any.
         /// </summary>

@@ -59,6 +59,12 @@ namespace cachesplain.Protocol
         /// </summary>
         public int? Verbosity;
 
+        // TODO [Greg 02/15/2015] : Added a temporary constructor to aid testing. Need to come back and fix unpacking in constructor for object graph.
+        public MemcachedBinaryExtras()
+        {
+            
+        }
+
         // TODO [Greg 01/06/2015] : Move the parsing out of the constructor.
 		public MemcachedBinaryExtras(ArraySegment<Byte> segment, MagicValue magic, Opcode opcode)
         {
