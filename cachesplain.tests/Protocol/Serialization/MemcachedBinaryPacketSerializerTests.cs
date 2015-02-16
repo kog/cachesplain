@@ -45,10 +45,19 @@ namespace cachesplain.tests.Protocol.Serialization
         /// Tests the case where someone hands us an otherwise empty packet. We'll do some quick defaulting.
         /// This is another one of those "this should never happen, but..." cases.
         /// </summary>
+        /// 
+        /// <remarks>
+        /// There seems to be a difference of opinion between the MS CLR and Mono as to what a new DateTime should give you...
+        /// The former gives you -62135568000, which is actually not actually the value quoted at 
+        /// https://msdn.microsoft.com/en-us/library/system.datetime.minvalue(v=vs.110).aspx. Mono does the right thing, which 
+        /// means this test is somewhat fragile with respect to being cross platform...
+        /// </remarks>
         [Test]
         public void TestSerializeEmptyPacket()
         {
-            Assert.That("{\"opCount\":0,\"time\":-62135568000,\"source\":null,\"destination\":null,\"size\":0,\"port\":0,\"operations\":[]}", Is.EqualTo(_serializer.Serialize(new MemcachedBinaryPacket())));            
+            // Set the packet date to a known value to prevent breaking when moving between the MS CLR and Mono.
+            var packet = new MemcachedBinaryPacket {PacketTime = new DateTime(1970, 2, 1, 0, 0, 0, DateTimeKind.Utc)};
+            Assert.That("{\"opCount\":0,\"time\":2678400,\"source\":null,\"destination\":null,\"size\":0,\"port\":0,\"operations\":[]}", Is.EqualTo(_serializer.Serialize(packet)));            
         }
 
         /// <summary>
