@@ -115,7 +115,12 @@ namespace cachesplain.Engine
                 Logger.Info("Configuring PCAP");
                 device.Open(DeviceMode.Promiscuous, 10000);
                 Logger.Info("Listening to interface {0} on port(s) {1}", captureOptions.DeviceName, String.Join(",", captureOptions.Ports));
-            }
+
+                if (!String.IsNullOrWhiteSpace(captureOptions.RawFilterExpression))
+                {
+                    Logger.Info("Using filter expression {0}", captureOptions.RawFilterExpression);
+                }            
+        }
             else
             {
                 Logger.Info("Reading input PCAP file");
