@@ -94,6 +94,42 @@ namespace cachesplain.tests
         }
 
         /// <summary>
+        /// Tests the case where we're handed a port range.
+        /// </summary>
+        [Test]
+        public void ParsePortsForPortRange()
+        {
+            var parsed = App.ParsePorts("11211,11212,11213...11216,11217,11218").ToList();
+
+            Assert.That(parsed.Count(), new EqualConstraint(8));
+            Assert.That(string.Join(",", parsed), new EqualConstraint("11211,11212,11213,11214,11215,11216,11217,11218"));
+        }
+
+        /// <summary>
+        /// Tests the case where we're handed a port range, but someone gets the order backwards.
+        /// </summary>
+        [Test]
+        public void ParsePortsForBackwardsRange()
+        {
+            var parsed = App.ParsePorts("11211,11212,11216...11213,11217,11218").ToList();
+
+            Assert.That(parsed.Count(), new EqualConstraint(8));
+            Assert.That(string.Join(",", parsed), new EqualConstraint("11211,11212,11213,11214,11215,11216,11217,11218"));     
+        }
+
+        /// <summary>
+        /// Tests the case where we're handed an invalid port range.
+        /// </summary>
+        [Test]
+        public void ParsePortsForInvalidRange()
+        {
+            var parsed = App.ParsePorts("11211,11212,11216...abcd,11217,11218").ToList();
+
+            Assert.That(parsed.Count(), new EqualConstraint(4));
+            Assert.That(string.Join(",", parsed), new EqualConstraint("11211,11212,11217,11218"));
+        }
+
+        /// <summary>
         /// Tests the case where we wind up parsing a null input. This should return null.
         /// </summary>
         [Test]

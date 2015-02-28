@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using cachesplain.Engine;
 using Mono.Options;
@@ -42,6 +43,11 @@ namespace cachesplain
         /// Holds a <see cref="NLog.Logger"/> to assist with debugging etc.
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Holds the regex we use for parsing our port range pattern.
+        /// </summary>
+        private static readonly Regex PortRegex = new Regex(@"(\d+)\.\.\.(\d+)");
 
 		public static void Main(string[] args)
 		{
@@ -148,34 +154,61 @@ namespace cachesplain
 				"Options:",
                 { "d", "enumerate the network devices available for listening.", v => _enumerateDevices = (v != null) },
 				{ "i:", "the {NAME} of the interface to listen on. Will be ignored if an input PCAP file is specified.", v => Options.DeviceName = v },
-				{ "p:",  "the {PORT} to listen on.\n" +  "this must be an integer. Defaults to 11211 if not otherwise specified. To specify multiple ports, separate them via commas.", v => Options.Ports = ParsePorts(v) },
+				{ "p:",  "the {PORT} to listen on.\n" +  "this must be an integer or a range as specified by port1...portN (inclusive). Defaults to 11211 if not otherwise specified. To specify multiple ports or ranges, separate them via commas.", v => Options.Ports = ParsePorts(v) },
 				{ "h|help",  "show this message and exit",  v => _needsHelp = (v != null) },
 				{ "f:", "a PCAP file to use instead of a device. If specified, will be used as the input device instead of specified interface.", v => { Options.Source = (null == v ? CaptureSource.Interface : CaptureSource.PcapFile); 
                                                                                                                                                          Options.DeviceName = v; }},
 				{ "x:", "An optional app-level filter expression to filter out packets (IE: opcode, magic, flags etc). Please note this is run across a parsed MemcachedBinaryOperation.", v => Options.RawFilterExpression = v }
 			};
 		}
-
+ 
         /// <summary>
         /// Provides a convenience method to parse the command-line given string of port(s) into an enumable of integers.
         /// </summary>
         /// 
-        /// <param name="ports">The raw command-line string of ports to use. Should not be null, should have at least one parseable integer.</param>
+        /// <param name="rawPorts">The raw command-line string of ports to use. Should not be null, should have at least one parseable integer.</param>
         /// 
         /// <returns>An enumerable of zero or more ports that we were able to parse. May be empty, will never be null.</returns>
-        public static IEnumerable<int> ParsePorts(string ports)
-        {
-            IEnumerable<int> parsedPorts = null;
+	    public static IEnumerable<int> ParsePorts(string rawPorts)
+	    {                        
+            var ports = new HashSet<int>();
 
-            if (!String.IsNullOrWhiteSpace(ports))
-            {
-                parsedPorts = ports.Split(',').Select(x => TryParseNullableInt(x).GetValueOrDefault()).Where(parsed => parsed > 0);
-            }
+	        if (!String.IsNullOrWhiteSpace(rawPorts))
+	        {
+                ports.UnionWith(rawPorts.Split(',').SelectMany(value => ParsePortItem(value)).Where(x => x > 0));
+	        }
 
-            return parsedPorts ?? new List<int>();
-        }
+            return ports;
+	    }
 
         /// <summary>
+        /// Parses a given potential port in our comma-separated list of ports, performing explosions of ranges as well. 
+        /// </summary>
+        /// 
+        /// <param name="raw"> The raw port item to try and parse.</param>
+        /// <returns>An enumerable of the ports we were able to parse. Invalid entries will be denoted as 0 and can be filtered out upstream.</returns>
+        /// 
+        /// <remarks>
+        /// Please note that if a range is detected, this will parse both sides of the expression (v1...v2) and try and use the lower value as
+        /// the bottom of the range, and the higher value as the top of the range. Further note that this is inclusive of the range parameters, so
+        /// if you specify 11211...11213 it will resolve to three ports: 11211, 11212 and 11213.
+        /// </remarks>
+	    public static IEnumerable<int> ParsePortItem(string raw)
+	    {
+            var expressionMatch = PortRegex.Match(raw);
+
+	        if (expressionMatch.Success)
+	        {
+	            var lhs = int.Parse(expressionMatch.Groups[1].Value);
+	            var rhs = int.Parse(expressionMatch.Groups[2].Value);
+
+                return Enumerable.Range(Math.Min(lhs, rhs), Math.Abs(lhs - rhs) + 1); 
+	        }
+
+            return new[] { TryParseNullableInt(raw).GetValueOrDefault() };
+	    }
+
+	    /// <summary>
         /// Provides a utility method to try and parse a given string into an integer. This is mostly a cheap hack to allow for LINQ to be used.
         /// </summary>
         /// 

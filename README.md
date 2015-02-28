@@ -79,21 +79,23 @@ Usage: cachesplain [OPTIONS]
 Start listening for packets on a specific port for a given interface.
 
 Options:
--d                         enumerate the network devices available for
-                             listening.
--i[=NAME]                  the NAME of the interface to listen on. Will be
-                             ignored if an input PCAP file is specified.
--p[=PORT]                  the PORT to listen on.
-                             this must be an integer. Defaults to 11211 if
-                             not otherwise specified.
--h, --help                 show this message and exit
--f[=VALUE]                 a PCAP file to use instead of a device. If
-                             specified, will be used as the input device
-                             instead of specified interface.
--x[=VALUE]                 An optional app-level filter expression to filter
-                             out packets (IE: opcode, magic, flags etc).
-                             Please note this is run across a parsed
-                             MemcachedBinaryOperation.
+  -d                         enumerate the network devices available for
+                               listening.
+  -i[=NAME]                  the NAME of the interface to listen on. Will be
+                               ignored if an input PCAP file is specified.
+  -p[=PORT]                  the PORT to listen on.
+                               this must be an integer or a range as specified
+                               by port1...portN (inclusive). Defaults to 11211
+                               if not otherwise specified. To specify multiple
+                               ports or ranges, separate them via commas.
+  -h, --help                 show this message and exit
+  -f[=VALUE]                 a PCAP file to use instead of a device. If
+                               specified, will be used as the input device
+                               instead of specified interface.
+  -x[=VALUE]                 An optional app-level filter expression to filter
+                               out packets (IE: opcode, magic, flags etc).
+                               Please note this is run across a parsed
+                               MemcachedBinaryOperation.
 ```
 
 It should go without saying that this documentation (README.md) may be out of date, and that you should always refer to the built in help option. If there are any conflicts, please trust whatever asking for help (-h, or --help) tells you.
@@ -110,17 +112,17 @@ At this point you'd start reading your out.log. This mode will read until SIGTER
 
 ###### Listening to multiple devices/on multiple ports:
 ```
-$ mono cachesplain.exe -i=en1 -p=11211,11212,11213
+$ mono cachesplain.exe -i=en1 -p=11211,11212,11213...11216
 Starting capture... SIGTERM to quit.
 ```
 
-Instead of a single port, passing in a comma-separated set of ports will cause CacheSplain to listen to multiple ports simultaenously.
+Instead of a single port, passing in a comma-separated set of ports will cause CacheSplain to listen to multiple ports simultaneously. Optionally, a port range can be specified startValue...endValue. In the example above, the range given is expanded to 11213, 11214, 11215, 11216 - that is to say, it's inclusive.
 
 For listening to multiple devices it is recommended to do so from multiple instances of CacheSplain: one for each device.
 
 ###### Reading a PCAP file:
 ```
-$ mono cachesplain.exe -f=/Users/kog/dump.pcap -p=11211
+$ mono cachesplain.exe -f=/Users/kog/dump.pcap
 Starting capture... SIGTERM to quit.
 ```
 
