@@ -136,7 +136,7 @@ namespace cachesplain.Protocol
             }
 
             // Get and Touch supports an expiration time.
-			if ((opcode == Opcode.Gat || opcode == Opcode.Gatq) && segment.Count >= 4)
+			if ((opcode == Opcode.Gat || opcode == Opcode.Gatq || opcode == Opcode.Touch) && segment.Count >= 4)
             {
 				Expiration = BinaryHelper.DecodeInt32(rawData, offset);
             }
