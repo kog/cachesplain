@@ -35,8 +35,11 @@ namespace cachesplain.Engine
         /// <remarks>
         /// If not otherwise specified, will be the port 11211.
         /// </remarks>
-        public IEnumerable<int> Ports {get { return _ports; }
-                                       set { _ports = value; }}
+        public IEnumerable<int> Ports
+        {
+            get { return _ports; }
+            set { _ports = value; }
+        }
 
         /// <summary>
         /// Holds the source of the capture. Must not be null, will not be

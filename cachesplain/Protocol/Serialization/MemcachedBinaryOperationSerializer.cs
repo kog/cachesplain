@@ -41,12 +41,12 @@ namespace cachesplain.Protocol.Serialization
                 WriteObject("key", operation.Key, jsonWriter);
 
                 // Write out our header data.
-                jsonWriter.WritePropertyName("header");             
+                jsonWriter.WritePropertyName("header");
                 HeaderSerializer.Serialize(operation.Header, jsonWriter);
 
                 // Write out whatever extras we've got. These are optional, and may actually be null...
                 jsonWriter.WritePropertyName("extras");
-                ExtrasSerializer.Serialize(operation.Extras, jsonWriter); 
+                ExtrasSerializer.Serialize(operation.Extras, jsonWriter);
             }
 
             // End it.

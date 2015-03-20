@@ -27,7 +27,7 @@ namespace cachesplain.Protocol.Serialization
             {
                 writer.WritePropertyName(fieldName);
                 writer.WriteValue(value);
-            }                
+            }
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace cachesplain.Protocol.Serialization
                 else
                 {
                     writer.WriteValue(value.ToString());
-                }   
+                }
             }
         }
 
@@ -82,7 +82,7 @@ namespace cachesplain.Protocol.Serialization
                 writer.WritePropertyName(fieldName);
 
                 // TODO [Greg 02/15/2015] : Move to DateTimeOffset when upgrading to 4.6.
-                writer.WriteValue((date.ToUniversalTime().Ticks - 621355968000000000) / 10000000);
+                writer.WriteValue((date.ToUniversalTime().Ticks - 621355968000000000)/10000000);
             }
         }
     }

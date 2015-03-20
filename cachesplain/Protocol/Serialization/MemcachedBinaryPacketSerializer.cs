@@ -40,7 +40,7 @@ namespace cachesplain.Protocol.Serialization
         public string Serialize(MemcachedBinaryPacket packet)
         {
             var builder = new StringBuilder();
-            
+
             using (var stringWriter = new StringWriter(builder))
             {
                 using (var jsonWriter = new JsonTextWriter(stringWriter))
@@ -74,7 +74,7 @@ namespace cachesplain.Protocol.Serialization
                     }
 
                     jsonWriter.WriteEndObject();
-                }   
+                }
             }
 
             return builder.ToString();

@@ -119,7 +119,7 @@ namespace cachesplain.Protocol
 
 				if (segment.Count >= 20)
                 {
-					Expiration = BinaryHelper.DecodeInt32(rawData, offset+=8);
+                    Expiration = BinaryHelper.DecodeInt32(rawData, offset += 8);
                 }
             }
 

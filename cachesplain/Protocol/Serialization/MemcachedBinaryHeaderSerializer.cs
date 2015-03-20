@@ -25,7 +25,7 @@ namespace cachesplain.Protocol.Serialization
 
             // TODO [Greg 02/15/2015] : figure out null handling policy. Need to figure out the consumers first.
             if (null != header)
-            {                
+            {
                 WriteAsString("magic", header.Magic, jsonWriter);
                 WriteAsString("opCode", header.Opcode, jsonWriter);
                 WriteObject("keyLength", header.KeyLength, jsonWriter);

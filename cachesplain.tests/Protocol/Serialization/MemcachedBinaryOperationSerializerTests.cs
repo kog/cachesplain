@@ -46,7 +46,7 @@ namespace cachesplain.tests.Protocol.Serialization
 
             // The writeline here is going to look a liiiitle funky...
             Console.WriteLine(" ->  %% ");
-            Assert.That("{\"key\":null,\"header\":{},\"extras\":{}}", Is.EqualTo(GetSerializedJson()));           
+            Assert.That("{\"key\":null,\"header\":{},\"extras\":{}}", Is.EqualTo(GetSerializedJson()));
         }
 
         /// <summary>
@@ -67,29 +67,29 @@ namespace cachesplain.tests.Protocol.Serialization
             var header = new byte[]
             {
                 // Magic
-                (byte)MagicValue.Received, 
+                (byte) MagicValue.Received,
 
                 // OpCode
-                (byte)Opcode.Set, 
+                (byte) Opcode.Set,
 
                 // Key length
-                0x15, 0x15, 
-                
+                0x15, 0x15,
+
                 // Extras length
-                0xAA, 
-                
+                0xAA,
+
                 // Data type
-                0xFF, 
-                
+                0xFF,
+
                 // Status/VBucket
-                0x00, 0x85, 
-                
+                0x00, 0x85,
+
                 // Total Body
-                0x45, 0x45, 0x45, 0x45, 
-                
+                0x45, 0x45, 0x45, 0x45,
+
                 // Opaque
-                0x12, 0x12, 0x12, 0x12, 
-                
+                0x12, 0x12, 0x12, 0x12,
+
                 // CAS
                 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99
             };

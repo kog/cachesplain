@@ -43,8 +43,8 @@ namespace cachesplain.tests.Protocol.Serialization
         {
             StringBuilder = new StringBuilder();
             StringWriter = new StringWriter(StringBuilder);
-            JsonWriter = new JsonTextWriter(StringWriter);   
- 
+            JsonWriter = new JsonTextWriter(StringWriter);
+
             DoWiring();
         }
 

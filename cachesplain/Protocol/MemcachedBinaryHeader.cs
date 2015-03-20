@@ -20,7 +20,7 @@ namespace cachesplain.Protocol
     /// It's worth noting that any multi-byte numerical value is in network order and bit twiddling must be performed.
     /// </remarks>
     public class MemcachedBinaryHeader
-    {        
+    {
         /// <summary>
         /// The magic indicates what manner of operation is underway: request to a Memcached server, or a response to a client.
         /// </summary>
@@ -92,35 +92,35 @@ namespace cachesplain.Protocol
 
         // TODO [Greg 01/06/2015] : Move the parsing out of the constructor.
 
-		public MemcachedBinaryHeader(ArraySegment<Byte> segment)
+        public MemcachedBinaryHeader(ArraySegment<Byte> segment)
         {
-			var rawData = segment.Array;
-			var offset = segment.Offset;
+            var rawData = segment.Array;
+            var offset = segment.Offset;
 
-			Magic = (MagicValue) rawData[offset];
-			Opcode = (Opcode) rawData[++offset];
-			KeyLength = BinaryHelper.DecodeUInt16(rawData, ++offset);
-			ExtrasLength = rawData[offset+=2];
-			DataType = rawData[++offset];
-			StatusOrVbucketId = BinaryHelper.DecodeUInt16(rawData, ++offset);
-			TotalBodyLength = BinaryHelper.DecodeInt32(rawData, offset+=2);
-			Opaque = BinaryHelper.DecodeInt32(rawData, offset+=4);
-			Cas = BinaryHelper.DecodeUInt64(rawData, offset + 4);
+            Magic = (MagicValue) rawData[offset];
+            Opcode = (Opcode) rawData[++offset];
+            KeyLength = BinaryHelper.DecodeUInt16(rawData, ++offset);
+            ExtrasLength = rawData[offset += 2];
+            DataType = rawData[++offset];
+            StatusOrVbucketId = BinaryHelper.DecodeUInt16(rawData, ++offset);
+            TotalBodyLength = BinaryHelper.DecodeInt32(rawData, offset += 2);
+            Opaque = BinaryHelper.DecodeInt32(rawData, offset += 4);
+            Cas = BinaryHelper.DecodeUInt64(rawData, offset + 4);
         }
 
         public override string ToString()
         {
             // TODO [Greg 12/27/2014] : Figure out a better way of handling optional raw binary in format string.
             return new StringBuilder().Append(Magic == MagicValue.Requested ? "TX## " : "RX## ")
-                                      .Append(String.Format("{0} (0x{1:X2}) ", Opcode, (byte)Opcode))
-                                      .Append("KeyLen: ").Append(KeyLength)
-                                      .Append(", ExtLen: ").Append(ExtrasLength)
-                                      .Append(", DataType: ").Append(DataType)
-                                      .Append(", Status/VBucket: ").Append(StatusOrVbucketId)
-                                      .Append(", BodyLen: ").Append(TotalBodyLength)
-                                      .Append(", Opaque: ").Append(Opaque)
-                                      .Append(", CAS: ").Append(Cas)
-                                      .ToString();
+                .Append(String.Format("{0} (0x{1:X2}) ", Opcode, (byte) Opcode))
+                .Append("KeyLen: ").Append(KeyLength)
+                .Append(", ExtLen: ").Append(ExtrasLength)
+                .Append(", DataType: ").Append(DataType)
+                .Append(", Status/VBucket: ").Append(StatusOrVbucketId)
+                .Append(", BodyLen: ").Append(TotalBodyLength)
+                .Append(", Opaque: ").Append(Opaque)
+                .Append(", CAS: ").Append(Cas)
+                .ToString();
         }
     }
 }

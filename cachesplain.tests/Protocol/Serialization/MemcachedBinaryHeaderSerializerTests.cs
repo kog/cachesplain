@@ -36,29 +36,29 @@ namespace cachesplain.tests.Protocol.Serialization
             var payload = new byte[]
             {
                 // Magic
-                (byte)MagicValue.Received, 
+                (byte) MagicValue.Received,
 
                 // OpCode
-                (byte)Opcode.Set, 
+                (byte) Opcode.Set,
 
                 // Key length
-                0x15, 0x15, 
-                
+                0x15, 0x15,
+
                 // Extras length
-                0xAA, 
-                
+                0xAA,
+
                 // Data type
-                0xFF, 
-                
+                0xFF,
+
                 // Status/VBucket
-                0x00, 0x85, 
-                
+                0x00, 0x85,
+
                 // Total Body
-                0x45, 0x45, 0x45, 0x45, 
-                
+                0x45, 0x45, 0x45, 0x45,
+
                 // Opaque
-                0x12, 0x12, 0x12, 0x12, 
-                
+                0x12, 0x12, 0x12, 0x12,
+
                 // CAS
                 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99
             };
@@ -79,29 +79,29 @@ namespace cachesplain.tests.Protocol.Serialization
             var payload = new byte[]
             {
                 // Magic
-                (byte)MagicValue.Requested, 
+                (byte) MagicValue.Requested,
 
                 // OpCode
-                (byte)Opcode.Touch, 
+                (byte) Opcode.Touch,
 
                 // Key length
-                0x14, 0x14, 
-                
+                0x14, 0x14,
+
                 // Extras length
-                0xAB, 
-                
+                0xAB,
+
                 // Data type
-                0xFE, 
-                
+                0xFE,
+
                 // Status/VBucket
-                0x00, 0x82, 
-                
+                0x00, 0x82,
+
                 // Total Body
-                0x33, 0x33, 0x33, 0x33, 
-                
+                0x33, 0x33, 0x33, 0x33,
+
                 // Opaque
-                0x11, 0x11, 0x11, 0x11, 
-                
+                0x11, 0x11, 0x11, 0x11,
+
                 // CAS
                 0x98, 0x98, 0x98, 0x98, 0x98, 0x98, 0x98, 0x98
             };
@@ -110,7 +110,7 @@ namespace cachesplain.tests.Protocol.Serialization
             Assert.That("TX## Touch (0x1C) KeyLen: 5140, ExtLen: 171, DataType: 254, Status/VBucket: 130, BodyLen: 858993459, Opaque: 286331153, CAS: 10995706271387654296", Is.EqualTo(header.ToString()));
 
             Serializer.Serialize(header, JsonWriter);
-            Assert.That("{\"magic\":\"Requested\",\"opCode\":\"Touch\",\"keyLength\":5140,\"extrasLength\":171,\"dataType\":254,\"vbucketId\":130,\"status\":null,\"totalBodyLength\":858993459,\"opaque\":286331153,\"cas\":10995706271387654296}", Is.EqualTo(GetSerializedJson()));           
+            Assert.That("{\"magic\":\"Requested\",\"opCode\":\"Touch\",\"keyLength\":5140,\"extrasLength\":171,\"dataType\":254,\"vbucketId\":130,\"status\":null,\"totalBodyLength\":858993459,\"opaque\":286331153,\"cas\":10995706271387654296}", Is.EqualTo(GetSerializedJson()));
         }
     }
 }

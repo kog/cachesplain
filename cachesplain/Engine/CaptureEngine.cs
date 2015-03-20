@@ -19,7 +19,7 @@ using Solenoid.Expressions;
 namespace cachesplain.Engine
 {
     // TODO [Greg 01/18/2015] : Pardon the dust, starting the refactoring...
-    
+
     public class CaptureEngine : IDisposable
     {
         /// <summary>
@@ -48,7 +48,7 @@ namespace cachesplain.Engine
         public void Stop()
         {
             Device.StopCapture();
-            Device.Close();    
+            Device.Close();
         }
 
         /// <summary>
@@ -63,10 +63,7 @@ namespace cachesplain.Engine
             OpenDevice(device, captureOptions);
 
             // TODO [Greg 12/31/2014] : Move handling of the packets elsewhere.
-            device.OnPacketArrival += (sender, e) =>
-            {
-                HandlePacket(e, filterExpression, CaptureOptions);
-            };
+            device.OnPacketArrival += (sender, e) => { HandlePacket(e, filterExpression, CaptureOptions); };
 
             Console.WriteLine("Starting capture... SIGTERM to quit.");
             device.StartCapture();
@@ -119,8 +116,8 @@ namespace cachesplain.Engine
                 if (!String.IsNullOrWhiteSpace(captureOptions.RawFilterExpression))
                 {
                     Logger.Info("Using filter expression {0}", captureOptions.RawFilterExpression);
-                }            
-        }
+                }
+            }
             else
             {
                 Logger.Info("Reading input PCAP file");
@@ -185,7 +182,7 @@ namespace cachesplain.Engine
             if (eventArgs.Packet.LinkLayerType != LinkLayers.Null)
             {
                 var parsed = Packet.ParsePacket(eventArgs.Packet.LinkLayerType, eventArgs.Packet.Data);
-                var tcpPacket = (TcpPacket)parsed.Extract(typeof(TcpPacket));
+                var tcpPacket = (TcpPacket) parsed.Extract(typeof (TcpPacket));
 
                 if (null != tcpPacket && null != tcpPacket.PayloadData && tcpPacket.PayloadData.Length > 0)
                 {
@@ -193,7 +190,7 @@ namespace cachesplain.Engine
 
                     if (null != relevantPort)
                     {
-                        var ipPacket = (IpPacket)tcpPacket.ParentPacket;
+                        var ipPacket = (IpPacket) tcpPacket.ParentPacket;
                         var packet = new MemcachedBinaryPacket(tcpPacket.PayloadData)
                         {
                             PacketTime = eventArgs.Packet.Timeval.Date,
@@ -210,7 +207,7 @@ namespace cachesplain.Engine
                             // If we've got a filter expression, see what it does...
                             try
                             {
-                                if (filterExpression == null || (bool)filterExpression.GetValue(operation, new Dictionary<string, object> { { "packet", packet } }))
+                                if (filterExpression == null || (bool) filterExpression.GetValue(operation, new Dictionary<string, object> {{"packet", packet}}))
                                 {
                                     // TODO: [Greg 01/02/2015] - Figure out something better to do with the packets.
                                     LogPacket(++i, packet.OperationCount, packet, operation);
@@ -253,7 +250,7 @@ namespace cachesplain.Engine
                 index, count, operation.Magic, operation.Opcode,
                 (String.IsNullOrWhiteSpace(operation.Key)) ? "<key omitted>" : operation.Key.ToString(CultureInfo.InvariantCulture),
                 (operation.Extras != null) ? operation.Extras.ToString() : "",
-                (operation.Magic == MagicValue.Received) ? "= " + (ResponseStatus)operation.Header.StatusOrVbucketId : "");
+                (operation.Magic == MagicValue.Received) ? "= " + (ResponseStatus) operation.Header.StatusOrVbucketId : "");
         }
 
         /// <summary>
@@ -274,7 +271,7 @@ namespace cachesplain.Engine
                 port = portsOfInterest.FirstOrDefault(x => x == sourcePort || x == destinationPort);
             }
 
-            return (0 == port) ? (int?)null : port;
+            return (0 == port) ? (int?) null : port;
         }
 
         public void Dispose()

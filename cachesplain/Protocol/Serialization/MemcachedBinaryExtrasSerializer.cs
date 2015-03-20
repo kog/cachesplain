@@ -32,7 +32,7 @@ namespace cachesplain.Protocol.Serialization
                 WriteObject("initialValue", extras.InitialValue, jsonWriter);
                 WriteObject("verbosity", extras.Verbosity, jsonWriter);
             }
-            
+
             jsonWriter.WriteEndObject();
         }
     }

@@ -38,7 +38,7 @@ namespace cachesplain.tests
 
             parsed = App.ParsePorts("        ");
             Assert.That(parsed, Is.Not.Null);
-            Assert.That(parsed, Is.Empty);   
+            Assert.That(parsed, Is.Empty);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace cachesplain.tests
             // If all we've got is bogus input, we should get back an empty list of ports.
             var parsed = App.ParsePorts("I,Love,Cheese");
             Assert.That(parsed, Is.Not.Null);
-            Assert.That(parsed, Is.Empty);   
+            Assert.That(parsed, Is.Empty);
 
             // If we've got integers buried in cruft, make sure we pull them out properly.
             var ordinalParsed = App.ParsePorts("some,3,stuff,4,here").ToList();
@@ -63,7 +63,7 @@ namespace cachesplain.tests
             // Partial fragments with numbers are not parseable.
             parsed = App.ParsePorts("99redballoons");
             Assert.That(parsed, Is.Not.Null);
-            Assert.That(parsed, Is.Empty);   
+            Assert.That(parsed, Is.Empty);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace cachesplain.tests
             var parsed = App.ParsePorts("0");
 
             Assert.That(parsed, Is.Not.Null);
-            Assert.That(parsed, Is.Empty);   
+            Assert.That(parsed, Is.Empty);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace cachesplain.tests
             var parsed = App.ParsePorts(",,,,,");
 
             Assert.That(parsed, Is.Not.Null);
-            Assert.That(parsed, Is.Empty);   
+            Assert.That(parsed, Is.Empty);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace cachesplain.tests
             var parsed = App.ParsePorts("11211,11212,11216...11213,11217,11218").ToList();
 
             Assert.That(parsed.Count(), new EqualConstraint(8));
-            Assert.That(string.Join(",", parsed), new EqualConstraint("11211,11212,11213,11214,11215,11216,11217,11218"));     
+            Assert.That(string.Join(",", parsed), new EqualConstraint("11211,11212,11213,11214,11215,11216,11217,11218"));
         }
 
         /// <summary>

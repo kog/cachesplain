@@ -8,9 +8,9 @@
 
 namespace cachesplain.Protocol
 {
-	public enum MagicValue : byte
-	{
-		Requested = 0x80,
-		Received = 0x81
-	}
+    public enum MagicValue : byte
+    {
+        Requested = 0x80,
+        Received = 0x81
+    }
 }

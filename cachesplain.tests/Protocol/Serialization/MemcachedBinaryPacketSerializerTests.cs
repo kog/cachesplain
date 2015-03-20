@@ -38,7 +38,7 @@ namespace cachesplain.tests.Protocol.Serialization
         [Test]
         public void TestSerializeNullPacket()
         {
-            Assert.That("{}", Is.EqualTo(_serializer.Serialize(null)));           
+            Assert.That("{}", Is.EqualTo(_serializer.Serialize(null)));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace cachesplain.tests.Protocol.Serialization
         {
             // Set the packet date to a known value to prevent breaking when moving between the MS CLR and Mono.
             var packet = new MemcachedBinaryPacket {PacketTime = new DateTime(1970, 2, 1, 0, 0, 0, DateTimeKind.Utc)};
-            Assert.That("{\"opCount\":0,\"time\":2678400,\"source\":null,\"destination\":null,\"size\":0,\"port\":0,\"operations\":[]}", Is.EqualTo(_serializer.Serialize(packet)));            
+            Assert.That("{\"opCount\":0,\"time\":2678400,\"source\":null,\"destination\":null,\"size\":0,\"port\":0,\"operations\":[]}", Is.EqualTo(_serializer.Serialize(packet)));
         }
 
         /// <summary>
@@ -65,21 +65,25 @@ namespace cachesplain.tests.Protocol.Serialization
         /// </summary>
         [Test]
         public void TestSerialize()
-        {           
+        {
             var extrasOne = new MemcachedBinaryExtras
             {
-                Flags = 42, Expiration = 99, Amount = 8675309, InitialValue = 314159265, Verbosity = 86
+                Flags = 42,
+                Expiration = 99,
+                Amount = 8675309,
+                InitialValue = 314159265,
+                Verbosity = 86
             };
 
             var headerOne = new MemcachedBinaryHeader(new ArraySegment<byte>(new byte[]
             {
-                (byte)MagicValue.Received, (byte)Opcode.Set, 
-                0x15, 0x15, 
-                0xAA, 
-                0xFF, 
-                0x00, 0x85,                 
-                0x45, 0x45, 0x45, 0x45, 
-                0x12, 0x12, 0x12, 0x12,                 
+                (byte) MagicValue.Received, (byte) Opcode.Set,
+                0x15, 0x15,
+                0xAA,
+                0xFF,
+                0x00, 0x85,
+                0x45, 0x45, 0x45, 0x45,
+                0x12, 0x12, 0x12, 0x12,
                 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99, 0x99
             }));
 
@@ -94,13 +98,13 @@ namespace cachesplain.tests.Protocol.Serialization
 
             var headerTwo = new MemcachedBinaryHeader(new ArraySegment<byte>(new byte[]
             {
-                (byte)MagicValue.Requested, (byte)Opcode.Touch, 
-                0x14, 0x14,                
-                0xAB,                
-                0xFE, 
-                0x00, 0x82, 
-                0x33, 0x33, 0x33, 0x33, 
-                0x11, 0x11, 0x11, 0x11, 
+                (byte) MagicValue.Requested, (byte) Opcode.Touch,
+                0x14, 0x14,
+                0xAB,
+                0xFE,
+                0x00, 0x82,
+                0x33, 0x33, 0x33, 0x33,
+                0x11, 0x11, 0x11, 0x11,
                 0x98, 0x98, 0x98, 0x98, 0x98, 0x98, 0x98, 0x98
             }));
 

@@ -55,7 +55,7 @@ namespace cachesplain.tests.Protocol.Serialization
             Serializer.Serialize(extras, JsonWriter);
 
             Assert.That("[Extras :: Flags: 42 :: Expiration: 99 :: Amount: 8675309 :: InitialValue: 314159265 :: Verbosity: 86]", Is.EqualTo(extras.ToString()));
-            Assert.That("{\"flags\":42,\"expiration\":99,\"amount\":8675309,\"initialValue\":314159265,\"verbosity\":86}", Is.EqualTo(GetSerializedJson()));           
+            Assert.That("{\"flags\":42,\"expiration\":99,\"amount\":8675309,\"initialValue\":314159265,\"verbosity\":86}", Is.EqualTo(GetSerializedJson()));
         }
     }
 }
