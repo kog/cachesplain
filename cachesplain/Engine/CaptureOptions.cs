@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using Solenoid.Expressions;
 
 namespace cachesplain.Engine
 {
@@ -52,19 +51,5 @@ namespace cachesplain.Engine
         /// May be null if no filtering is configured.
         /// </summary>
         public String RawFilterExpression { get; set; }
-
-        // TODO [Greg 01/18/2015] : This will probably need to be removed in later refactoring.
-
-        /// <summary>
-        /// Holds the parsed version of the user specified application-level filter expression. This
-        /// may be null if no filtering is configured, of if the given expression could not be compiled.
-        /// </summary>
-        /// 
-        /// <remarks>
-        /// The given expression is run against packets after they're passed to see if they meet a given 
-        /// criteria (IE: opcode is x, is a request). If no  expression is given, any packet that is 
-        /// parseable will be logged. If the expression cannot be evaluated for some reason, it will be ignored.
-        /// </remarks>
-        public IExpression FilterExpression { get; set; }
     }
 }

@@ -9,12 +9,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using cachesplain.Protocol;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.Scripting.CSharp;
 using NLog;
 using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
-using Solenoid.Expressions;
 
 namespace cachesplain.Engine
 {
@@ -58,7 +60,7 @@ namespace cachesplain.Engine
         /// <param name="device">The device to start capturing on. Must not be null.</param>
         /// <param name="captureOptions">The capture options to use. Must not be null.</param>
         /// <param name="filterExpression">The optional application-level filter expression to use on parsed packets. May be null, indicating no filtering.</param>
-        public void StartCapture(ICaptureDevice device, CaptureOptions captureOptions, IExpression filterExpression)
+        public void StartCapture(ICaptureDevice device, CaptureOptions captureOptions, Script filterExpression)
         {
             OpenDevice(device, captureOptions);
 
@@ -73,17 +75,21 @@ namespace cachesplain.Engine
         /// Compiles the filter expression we'll use to perform application-level filtering of parsed Memcached binary packets.
         /// </summary>
         /// 
-        /// <returns>The <see cref="IExpression"/> that is parsed out of the user input filter. If no filter, or an invalid filter,
+        /// <returns>The <see cref="Script"/> that is parsed out of the user input filter. If no filter, or an invalid filter,
         /// is specified, this will return null.
         /// </returns>
-        public IExpression CompileFilterExpression()
+        public Script CompileFilterExpression()
         {
-            IExpression filterExpression = null;
+            Script script = null;
+
             if (!String.IsNullOrEmpty(CaptureOptions.RawFilterExpression))
             {
                 try
                 {
-                    filterExpression = Expression.Parse(CaptureOptions.RawFilterExpression);
+                    // TODO [Greg 04/05/2015] : These namespaces/assemblies should be enough. Need to run through all the examples in the README markdown.
+                    // TODO [Greg 04/05/2015] : Also need to see if there's any other optimzation to do: compiling/holding on to assemblies etc.
+                    var options = ScriptOptions.Default.AddReferences(Assembly.GetAssembly(typeof(CaptureEngine))).AddNamespaces("cachesplain.Protocol");
+                    script = CSharpScript.Create(CaptureOptions.RawFilterExpression, options).WithReturnType(typeof(bool));
                 }
                 catch (Exception ex)
                 {
@@ -91,7 +97,7 @@ namespace cachesplain.Engine
                 }
             }
 
-            return filterExpression;
+            return script;
         }
 
         // TODO [Greg 01/18/2015] : Try and abstract this portion. Maybe networking portion should be moved into a collaborating class?
@@ -177,7 +183,7 @@ namespace cachesplain.Engine
         /// <param name="eventArgs">The <see cref="CaptureEventArgs"/> from the packet capture event. Must not be null.</param>
         /// <param name="filterExpression">An optional, user-specified filter expression. May be null if no filter is to be applied.</param>
         /// <param name="captureOptions">The user-input capture options to use.</param>
-        public void HandlePacket(CaptureEventArgs eventArgs, IExpression filterExpression, CaptureOptions captureOptions)
+        public void HandlePacket(CaptureEventArgs eventArgs, Script filterExpression, CaptureOptions captureOptions)
         {
             if (eventArgs.Packet.LinkLayerType != LinkLayers.Null)
             {
@@ -207,7 +213,7 @@ namespace cachesplain.Engine
                             // If we've got a filter expression, see what it does...
                             try
                             {
-                                if (filterExpression == null || (bool) filterExpression.GetValue(operation, new Dictionary<string, object> {{"packet", packet}}))
+                                if (null == filterExpression || (bool)filterExpression.Run(new ExecutionContext {Operation = operation, Packet = packet}).ReturnValue)
                                 {
                                     // TODO: [Greg 01/02/2015] - Figure out something better to do with the packets.
                                     LogPacket(++i, packet.OperationCount, packet, operation);
@@ -272,6 +278,15 @@ namespace cachesplain.Engine
             }
 
             return (0 == port) ? (int?) null : port;
+        }
+
+        /// <summary>
+        /// Creates a non-anonymous, public, utility class to handle the context we're going to pass to our CScript interpreting.
+        /// </summary>
+        public class ExecutionContext
+        {
+            public MemcachedBinaryOperation Operation { get; set; }
+            public MemcachedBinaryPacket Packet { get; set; }
         }
 
         public void Dispose()
