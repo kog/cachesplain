@@ -88,7 +88,9 @@ namespace cachesplain.Engine
                 {
                     // TODO [Greg 04/05/2015] : These namespaces/assemblies should be enough. Need to run through all the examples in the README markdown.
                     // TODO [Greg 04/05/2015] : Also need to see if there's any other optimzation to do: compiling/holding on to assemblies etc.
-                    var options = ScriptOptions.Default.AddReferences(Assembly.GetAssembly(typeof(CaptureEngine))).AddNamespaces("cachesplain.Protocol");
+                    var options = ScriptOptions.Default.AddReferences(Assembly.GetAssembly(typeof(CaptureEngine)))
+                                                       .AddNamespaces(typeof(Opcode).Namespace);
+
                     script = CSharpScript.Create(CaptureOptions.RawFilterExpression, options).WithReturnType(typeof(bool));
                 }
                 catch (Exception ex)
